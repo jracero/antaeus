@@ -52,8 +52,8 @@ class BillingServiceTest {
 
         billingService.applyCharges()
         verify { invoiceService.updateInvoiceStatus(1, InvoiceStatus.PAID) }
-        verify(exactly = 0) { invoiceService.updateInvoiceStatus(2, InvoiceStatus.PENDING) }
-        verify { invoiceService.updateInvoiceStatus(3, InvoiceStatus.RETRY) }
+        verify(exactly = 0) { invoiceService.updateInvoiceStatus(2, any()) }
+        verify(exactly = 0) { invoiceService.updateInvoiceStatus(3, any()) }
         verify { invoiceService.updateInvoiceStatus(4, InvoiceStatus.CUSTOMER_ISSUE) }
         verify { invoiceService.updateInvoiceStatus(5, InvoiceStatus.CURRENCY_ISSUE) }
     }
