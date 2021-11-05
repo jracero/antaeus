@@ -8,6 +8,7 @@
 
 package io.pleo.antaeus.core.external
 
+import io.pleo.antaeus.models.ChargeStatus
 import io.pleo.antaeus.models.Invoice
 
 interface PaymentProvider {
@@ -24,5 +25,5 @@ interface PaymentProvider {
           `NetworkException`: when a network error happens.
      */
 
-    fun charge(invoice: Invoice): Boolean
+    fun charge(invoice: Invoice): ChargeStatus
 }
