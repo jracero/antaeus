@@ -2,7 +2,7 @@ package io.pleo.antaeus.core.services
 
 import io.pleo.antaeus.core.external.PaymentProvider
 import io.pleo.antaeus.models.ChargeStatus
-import io.pleo.antaeus.models.ChargeTransaction
+import io.pleo.antaeus.models.InvoicesResult
 import io.pleo.antaeus.models.InvoiceStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -16,8 +16,8 @@ class BillingService(
 ) {
     private val logger = KotlinLogging.logger {}
 
-    fun applyCharges(): ChargeTransaction {
-        val chargeTransaction = ChargeTransaction();
+    fun applyCharges(): InvoicesResult {
+        val chargeTransaction = InvoicesResult();
         runBlocking(Dispatchers.Default) {
             invoiceService.fetchPendingInvoices().map {
 

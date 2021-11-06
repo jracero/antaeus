@@ -2,7 +2,7 @@ package io.pleo.antaeus.models
 
 import com.google.gson.Gson
 
-class ChargeTransaction {
+class InvoicesResult {
 
     private var successfullyCharged = 0
     private var pendingToCharge = 0
