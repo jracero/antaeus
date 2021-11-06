@@ -39,7 +39,13 @@ class BillingServiceTest {
         )
     }
 
-    private val billingService = BillingService(paymentProvider = provider, invoiceService = invoiceService)
+    private val chargeService = mockk<ChargeService> {
+        every { createChargeTransaction(any()) } returns null
+
+    }
+
+    private val billingService = BillingService(paymentProvider = provider, invoiceService = invoiceService, chargeService = chargeService)
+
 
     @Test
     fun `will update invoice status to PAID`() {

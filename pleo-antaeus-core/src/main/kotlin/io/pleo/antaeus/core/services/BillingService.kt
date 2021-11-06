@@ -1,9 +1,10 @@
 package io.pleo.antaeus.core.services
 
 import io.pleo.antaeus.core.external.PaymentProvider
+import io.pleo.antaeus.models.Charge
 import io.pleo.antaeus.models.ChargeStatus
-import io.pleo.antaeus.models.InvoicesResult
 import io.pleo.antaeus.models.InvoiceStatus
+import io.pleo.antaeus.models.InvoicesResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -12,14 +13,18 @@ import mu.KotlinLogging
 
 
 class BillingService(
-    private val paymentProvider: PaymentProvider, private val invoiceService: InvoiceService
+    private val paymentProvider: PaymentProvider, private val invoiceService: InvoiceService, private val chargeService: ChargeService
 ) {
     private val logger = KotlinLogging.logger {}
 
-    fun applyCharges(): InvoicesResult {
+    fun applyCharges(): Charge? {
         val chargeTransaction = InvoicesResult();
+
+        val pendingInvoices = invoiceService.fetchPendingInvoices()
+        chargeTransaction.totalInvoices(pendingInvoices.size)
+
         runBlocking(Dispatchers.Default) {
-            invoiceService.fetchPendingInvoices().map {
+            pendingInvoices.map {
 
                 val charge = async {
                     retry {
@@ -37,7 +42,6 @@ class BillingService(
                         chargeTransaction.stillPendingToCharge()
                     }
                     ChargeStatus.NETWORK_ISSUE -> {
-                        logger.info("Network issues to charge {}", it.toString())
                         chargeTransaction.noChargedInvoicesDueToNetworkIssues()
                     }
                     ChargeStatus.CUSTOMER_NOT_FOUND -> {
@@ -50,11 +54,10 @@ class BillingService(
                     }
                 }
             }
-            logger.info(chargeTransaction.toString())
             logger.info("Transaction completed")
             return@runBlocking chargeTransaction
         }
-        return chargeTransaction
+        return chargeService.createChargeTransaction(chargeTransaction.toCharge())
     }
 
 
@@ -70,7 +73,7 @@ class BillingService(
             val result = block()
             if (result != ChargeStatus.NETWORK_ISSUE)
                 return result
-            System.out.println("failed attempt...")
+            logger.warn("failed attempt due to network issue...")
             delay(currentDelay)
             currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelay)
         }

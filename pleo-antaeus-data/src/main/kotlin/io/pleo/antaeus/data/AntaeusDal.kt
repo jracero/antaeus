@@ -8,13 +8,13 @@
 package io.pleo.antaeus.data
 
 
+import io.pleo.antaeus.models.Charge
 import io.pleo.antaeus.models.Currency
 import io.pleo.antaeus.models.Customer
 import io.pleo.antaeus.models.Invoice
 import io.pleo.antaeus.models.InvoiceStatus
 import io.pleo.antaeus.models.Money
 import org.jetbrains.exposed.sql.Database
-
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
@@ -100,5 +100,40 @@ class AntaeusDal(private val db: Database) {
         }
 
         return fetchCustomer(id)
+    }
+
+    fun createChargeTransaction(charge: Charge): Charge? {
+        val id = transaction(db) {
+            // Insert the invoice and returns its new id.
+            ChargeTable
+                .insert {
+                    it[this.invoices] = charge.invoices
+                    it[this.charged] = charge.charged
+                    it[this.noFunds] = charge.noFunds
+                    it[this.unknownCustomer] = charge.unknownCustomer
+                    it[this.currencyMismatch] = charge.currencyMismatch
+                } get ChargeTable.id
+        }
+        return fetchCharge(id)
+    }
+
+    fun fetchChargeTransaction(): List<Charge> {
+        return transaction(db) {
+            ChargeTable
+                .selectAll()
+                .map { it.toCharge() }
+                .sortedByDescending { charge -> charge.chargeCreated }
+        }
+    }
+
+    private fun fetchCharge(id: Int): Charge? {
+        // transaction(db) runs the internal query as a new database transaction.
+        return transaction(db) {
+            // Returns the first invoice with matching id.
+            ChargeTable
+                .select { ChargeTable.id.eq(id) }
+                .firstOrNull()
+                ?.toCharge()
+        }
     }
 }
