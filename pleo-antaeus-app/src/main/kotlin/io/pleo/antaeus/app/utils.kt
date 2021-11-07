@@ -3,7 +3,11 @@ import io.pleo.antaeus.core.exceptions.CustomerNotFoundException
 import io.pleo.antaeus.core.exceptions.NetworkException
 import io.pleo.antaeus.core.external.PaymentProvider
 import io.pleo.antaeus.data.AntaeusDal
-import io.pleo.antaeus.models.*
+import io.pleo.antaeus.models.ChargeStatus
+import io.pleo.antaeus.models.Currency
+import io.pleo.antaeus.models.Invoice
+import io.pleo.antaeus.models.InvoiceStatus
+import io.pleo.antaeus.models.Money
 import java.math.BigDecimal
 import kotlin.random.Random
 
@@ -55,12 +59,16 @@ internal fun getPaymentProvider(): PaymentProvider {
                     return ChargeStatus.SUCCESSFULLY_CHARGED
                 return ChargeStatus.INSUFFICIENT_FUNDS
 
-            } catch (e: NetworkException) {
-                return ChargeStatus.NETWORK_ISSUE
-            } catch (e: CustomerNotFoundException) {
-                return ChargeStatus.CUSTOMER_NOT_FOUND
-            } catch (e: CurrencyMismatchException) {
-                return ChargeStatus.CURRENCY_MISMATCH
+            } catch (ex: Exception) {
+                when (ex) {
+                    is CustomerNotFoundException -> {
+                        return ChargeStatus.CUSTOMER_NOT_FOUND
+                    }
+                    is CurrencyMismatchException -> {
+                        return ChargeStatus.CURRENCY_MISMATCH
+                    }
+                    else -> return ChargeStatus.NETWORK_ISSUE
+                }
             }
         }
     }

@@ -15,23 +15,23 @@ class InvoicesResult {
         totalInvoices = total
     }
 
-    fun successfullyCharged() {
+    fun increaseSuccessfullyCharged() {
         successfullyCharged++
     }
 
-    fun stillPendingToCharge() {
+    fun increasePendingToCharge() {
         pendingToCharge++
     }
 
-    fun noChargedInvoicesDueToNetworkIssues() {
+    fun increaseNoChargedDueToNetworkIssues() {
         unableToChargeDueToNetworkIssues++
     }
 
-    fun noChargedInvoicesDueToUnknownCustomer() {
+    fun increaseNoChargedDueToUnknownCustomer() {
         unableToChargeDueToUnknownCustomer++
     }
 
-    fun noChargedInvoicesDueToCurrencyMismatch() {
+    fun increaseNoChargedDueToCurrencyMismatch() {
         unableToChargeDueToCurrencyMismatch++
     }
 

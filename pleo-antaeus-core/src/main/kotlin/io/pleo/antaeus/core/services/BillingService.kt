@@ -49,22 +49,22 @@ class BillingService(
         when (charge.await()) {
             ChargeStatus.SUCCESSFULLY_CHARGED -> {
                 updateInvoiceStatus(it.id, InvoiceStatus.PAID)
-                chargeTransaction.successfullyCharged()
+                chargeTransaction.increaseSuccessfullyCharged()
             }
             ChargeStatus.INSUFFICIENT_FUNDS -> {
                 logger.info("Account balance did not allow the charge {}", it.toString())
-                chargeTransaction.stillPendingToCharge()
+                chargeTransaction.increasePendingToCharge()
             }
             ChargeStatus.NETWORK_ISSUE -> {
-                chargeTransaction.noChargedInvoicesDueToNetworkIssues()
+                chargeTransaction.increaseNoChargedDueToNetworkIssues()
             }
             ChargeStatus.CUSTOMER_NOT_FOUND -> {
                 updateInvoiceStatus(it.id, InvoiceStatus.CUSTOMER_ISSUE)
-                chargeTransaction.noChargedInvoicesDueToUnknownCustomer()
+                chargeTransaction.increaseNoChargedDueToUnknownCustomer()
             }
             ChargeStatus.CURRENCY_MISMATCH -> {
                 updateInvoiceStatus(it.id, InvoiceStatus.CURRENCY_ISSUE)
-                chargeTransaction.noChargedInvoicesDueToCurrencyMismatch()
+                chargeTransaction.increaseNoChargedDueToCurrencyMismatch()
             }
         }
     }

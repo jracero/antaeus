@@ -104,7 +104,6 @@ class AntaeusDal(private val db: Database) {
 
     fun createChargeTransaction(charge: Charge): Charge? {
         val id = transaction(db) {
-            // Insert the invoice and returns its new id.
             ChargeTable
                 .insert {
                     it[this.invoices] = charge.invoices
@@ -127,9 +126,7 @@ class AntaeusDal(private val db: Database) {
     }
 
     private fun fetchCharge(id: Int): Charge? {
-        // transaction(db) runs the internal query as a new database transaction.
         return transaction(db) {
-            // Returns the first invoice with matching id.
             ChargeTable
                 .select { ChargeTable.id.eq(id) }
                 .firstOrNull()
