@@ -3,8 +3,10 @@ package io.pleo.antaeus.core.services
 import io.pleo.antaeus.core.external.PaymentProvider
 import io.pleo.antaeus.models.Charge
 import io.pleo.antaeus.models.ChargeStatus
+import io.pleo.antaeus.models.Invoice
 import io.pleo.antaeus.models.InvoiceStatus
 import io.pleo.antaeus.models.InvoicesResult
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -27,32 +29,11 @@ class BillingService(
             pendingInvoices.map {
 
                 val charge = async {
-                    retry {
+                    retry(3) {
                         paymentProvider.charge(it)
                     }
                 }
-
-                when (charge.await()) {
-                    ChargeStatus.SUCCESSFULLY_CHARGED -> {
-                        updateInvoiceStatus(it.id, InvoiceStatus.PAID)
-                        chargeTransaction.successfullyCharged()
-                    }
-                    ChargeStatus.INSUFFICIENT_FUNDS -> {
-                        logger.info("Account balance did not allow the charge {}", it.toString())
-                        chargeTransaction.stillPendingToCharge()
-                    }
-                    ChargeStatus.NETWORK_ISSUE -> {
-                        chargeTransaction.noChargedInvoicesDueToNetworkIssues()
-                    }
-                    ChargeStatus.CUSTOMER_NOT_FOUND -> {
-                        updateInvoiceStatus(it.id, InvoiceStatus.CUSTOMER_ISSUE)
-                        chargeTransaction.noChargedInvoicesDueToUnknownCustomer()
-                    }
-                    ChargeStatus.CURRENCY_MISMATCH -> {
-                        updateInvoiceStatus(it.id, InvoiceStatus.CURRENCY_ISSUE)
-                        chargeTransaction.noChargedInvoicesDueToCurrencyMismatch()
-                    }
-                }
+                processPaymentProviderResponse(charge, it, chargeTransaction)
             }
             logger.info("Transaction completed")
             return@runBlocking chargeTransaction
@@ -60,9 +41,36 @@ class BillingService(
         return chargeService.createChargeTransaction(chargeTransaction.toCharge())
     }
 
+    private suspend fun processPaymentProviderResponse(
+        charge: Deferred<ChargeStatus>,
+        it: Invoice,
+        chargeTransaction: InvoicesResult
+    ) {
+        when (charge.await()) {
+            ChargeStatus.SUCCESSFULLY_CHARGED -> {
+                updateInvoiceStatus(it.id, InvoiceStatus.PAID)
+                chargeTransaction.successfullyCharged()
+            }
+            ChargeStatus.INSUFFICIENT_FUNDS -> {
+                logger.info("Account balance did not allow the charge {}", it.toString())
+                chargeTransaction.stillPendingToCharge()
+            }
+            ChargeStatus.NETWORK_ISSUE -> {
+                chargeTransaction.noChargedInvoicesDueToNetworkIssues()
+            }
+            ChargeStatus.CUSTOMER_NOT_FOUND -> {
+                updateInvoiceStatus(it.id, InvoiceStatus.CUSTOMER_ISSUE)
+                chargeTransaction.noChargedInvoicesDueToUnknownCustomer()
+            }
+            ChargeStatus.CURRENCY_MISMATCH -> {
+                updateInvoiceStatus(it.id, InvoiceStatus.CURRENCY_ISSUE)
+                chargeTransaction.noChargedInvoicesDueToCurrencyMismatch()
+            }
+        }
+    }
 
     private suspend fun <T> retry(
-        times: Int = 3,
+        times: Int = 5,
         initialDelay: Long = 100,
         maxDelay: Long = 1000,
         factor: Double = 2.0,

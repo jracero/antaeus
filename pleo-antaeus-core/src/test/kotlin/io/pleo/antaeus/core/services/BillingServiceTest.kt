@@ -62,5 +62,6 @@ class BillingServiceTest {
         verify(exactly = 0) { invoiceService.updateInvoiceStatus(3, any()) }
         verify { invoiceService.updateInvoiceStatus(4, InvoiceStatus.CUSTOMER_ISSUE) }
         verify { invoiceService.updateInvoiceStatus(5, InvoiceStatus.CURRENCY_ISSUE) }
+        verify { chargeService.createChargeTransaction(any()) }
     }
 }
