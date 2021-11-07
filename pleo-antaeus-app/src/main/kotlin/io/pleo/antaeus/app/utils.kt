@@ -60,14 +60,14 @@ internal fun getPaymentProvider(): PaymentProvider {
                 return ChargeStatus.INSUFFICIENT_FUNDS
 
             } catch (ex: Exception) {
-                when (ex) {
+                return when (ex) {
                     is CustomerNotFoundException -> {
-                        return ChargeStatus.CUSTOMER_NOT_FOUND
+                        ChargeStatus.CUSTOMER_NOT_FOUND
                     }
                     is CurrencyMismatchException -> {
-                        return ChargeStatus.CURRENCY_MISMATCH
+                        ChargeStatus.CURRENCY_MISMATCH
                     }
-                    else -> return ChargeStatus.NETWORK_ISSUE
+                    else -> ChargeStatus.NETWORK_ISSUE
                 }
             }
         }
