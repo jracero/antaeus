@@ -200,6 +200,10 @@ I also considered but not implemented:
 
 ## Finally
 
-I have enjoyed a lot this code challenge. As I mentioned before, Kotlin caught my attention some time ago and I had that pending debt to try it some
+I have enjoyed a lot this code challenge. As I mentioned before, Kotlin caught my attention some time ago, and I had that pending debt to try it some
 day. I would like to see what Kotlin can offer in a real application.
+
+I also had special interest to try a different language apart from Java, and feel in first person how different languages resolve the same issues.
+
+Time spent: 12h aprox
 
