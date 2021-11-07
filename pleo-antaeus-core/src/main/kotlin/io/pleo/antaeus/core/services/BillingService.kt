@@ -38,7 +38,7 @@ class BillingService(
                         chargeTransaction.successfullyCharged()
                     }
                     ChargeStatus.INSUFFICIENT_FUNDS -> {
-                        logger.info("Insufficient funds to charge {}", it.toString())
+                        logger.info("Account balance did not allow the charge {}", it.toString())
                         chargeTransaction.stillPendingToCharge()
                     }
                     ChargeStatus.NETWORK_ISSUE -> {
