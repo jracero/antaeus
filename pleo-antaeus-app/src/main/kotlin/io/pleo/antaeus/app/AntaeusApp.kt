@@ -12,7 +12,9 @@ import io.pleo.antaeus.core.services.BillingService
 import io.pleo.antaeus.core.services.ChargeService
 import io.pleo.antaeus.core.services.CustomerService
 import io.pleo.antaeus.core.services.InvoiceService
-import io.pleo.antaeus.data.AntaeusDal
+import io.pleo.antaeus.data.AntaeusChargeDal
+import io.pleo.antaeus.data.AntaeusCustomerDal
+import io.pleo.antaeus.data.AntaeusInvoiceDal
 import io.pleo.antaeus.data.ChargeTable
 import io.pleo.antaeus.data.CustomerTable
 import io.pleo.antaeus.data.InvoiceTable
@@ -52,18 +54,20 @@ fun main() {
         }
 
     // Set up data access layer.
-    val dal = AntaeusDal(db = db)
+    val customerDal = AntaeusCustomerDal(db = db)
+    val invoiceDal = AntaeusInvoiceDal(db = db)
+    val chargeDal = AntaeusChargeDal(db = db)
 
     // Insert example data in the database.
-    setupInitialData(dal = dal)
+    setupInitialData(customerDal = customerDal, invoiceDal = invoiceDal)
 
     // Get third parties
     val paymentProvider = getPaymentProvider()
 
     // Create core services
-    val invoiceService = InvoiceService(dal = dal)
-    val customerService = CustomerService(dal = dal)
-    val chargeService = ChargeService(dal = dal)
+    val invoiceService = InvoiceService(dal = invoiceDal)
+    val customerService = CustomerService(dal = customerDal)
+    val chargeService = ChargeService(dal = chargeDal)
 
     // This is _your_ billing service to be included where you see fit
     val billingService = BillingService(paymentProvider = paymentProvider, invoiceService = invoiceService, chargeService = chargeService)

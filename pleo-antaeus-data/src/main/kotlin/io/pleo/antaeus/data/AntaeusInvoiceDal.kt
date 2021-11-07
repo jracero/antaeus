@@ -8,8 +8,6 @@
 package io.pleo.antaeus.data
 
 
-import io.pleo.antaeus.models.Charge
-import io.pleo.antaeus.models.Currency
 import io.pleo.antaeus.models.Customer
 import io.pleo.antaeus.models.Invoice
 import io.pleo.antaeus.models.InvoiceStatus
@@ -22,7 +20,7 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 
-class AntaeusDal(private val db: Database) {
+class AntaeusInvoiceDal(private val db: Database) {
     fun fetchInvoice(id: Int): Invoice? {
         // transaction(db) runs the internal query as a new database transaction.
         return transaction(db) {
@@ -71,66 +69,6 @@ class AntaeusDal(private val db: Database) {
                 .update(where = { InvoiceTable.id.eq(id) }) {
                     it[this.status] = status.toString()
                 }
-        }
-    }
-
-    fun fetchCustomer(id: Int): Customer? {
-        return transaction(db) {
-            CustomerTable
-                .select { CustomerTable.id.eq(id) }
-                .firstOrNull()
-                ?.toCustomer()
-        }
-    }
-
-    fun fetchCustomers(): List<Customer> {
-        return transaction(db) {
-            CustomerTable
-                .selectAll()
-                .map { it.toCustomer() }
-        }
-    }
-
-    fun createCustomer(currency: Currency): Customer? {
-        val id = transaction(db) {
-            // Insert the customer and return its new id.
-            CustomerTable.insert {
-                it[this.currency] = currency.toString()
-            } get CustomerTable.id
-        }
-
-        return fetchCustomer(id)
-    }
-
-    fun createChargeTransaction(charge: Charge): Charge? {
-        val id = transaction(db) {
-            ChargeTable
-                .insert {
-                    it[this.invoices] = charge.invoices
-                    it[this.charged] = charge.charged
-                    it[this.noFunds] = charge.noFunds
-                    it[this.unknownCustomer] = charge.unknownCustomer
-                    it[this.currencyMismatch] = charge.currencyMismatch
-                } get ChargeTable.id
-        }
-        return fetchCharge(id)
-    }
-
-    fun fetchChargeTransaction(): List<Charge> {
-        return transaction(db) {
-            ChargeTable
-                .selectAll()
-                .map { it.toCharge() }
-                .sortedByDescending { charge -> charge.chargeCreated }
-        }
-    }
-
-    private fun fetchCharge(id: Int): Charge? {
-        return transaction(db) {
-            ChargeTable
-                .select { ChargeTable.id.eq(id) }
-                .firstOrNull()
-                ?.toCharge()
         }
     }
 }

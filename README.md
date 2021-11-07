@@ -198,6 +198,8 @@ I also considered but not implemented:
 * Maybe some customers with account balance did not allow the charge, because maybe payroll is done after 1st of the month. A solution for this
   situation it could be to schedule more charge requests maybe on the 5th and the 10th of the month
 
+* The new entrypoint should be secured via user access token or similar to be sure non trusted requests will be processed
+
 ## Finally
 
 I have enjoyed a lot this code challenge. As I mentioned before, Kotlin caught my attention some time ago, and I had that pending debt to try it some

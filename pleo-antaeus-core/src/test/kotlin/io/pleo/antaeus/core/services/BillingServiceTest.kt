@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.pleo.antaeus.core.external.PaymentProvider
+import io.pleo.antaeus.models.Charge
 import io.pleo.antaeus.models.ChargeStatus
 import io.pleo.antaeus.models.Currency
 import io.pleo.antaeus.models.Invoice
@@ -12,6 +13,7 @@ import io.pleo.antaeus.models.Money
 
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
+import java.util.*
 
 class BillingServiceTest {
 
@@ -40,7 +42,7 @@ class BillingServiceTest {
     }
 
     private val chargeService = mockk<ChargeService> {
-        every { createChargeTransaction(any()) } returns null
+        every { createChargeTransaction(any()) } returns Charge(1, Date(), 1, 1, 0, 0, 0)
 
     }
 

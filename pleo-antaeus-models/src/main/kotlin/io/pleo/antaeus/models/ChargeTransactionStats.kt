@@ -2,7 +2,7 @@ package io.pleo.antaeus.models
 
 import org.joda.time.DateTime
 
-class InvoicesResult {
+class ChargeTransactionStats {
 
     private var totalInvoices = 0
     private var successfullyCharged = 0

@@ -1,15 +1,12 @@
 package io.pleo.antaeus.core.services
 
-import io.pleo.antaeus.data.AntaeusDal
+import io.pleo.antaeus.data.AntaeusChargeDal
 import io.pleo.antaeus.models.Charge
 
-class ChargeService(private val dal: AntaeusDal) {
+class ChargeService(private val dal: AntaeusChargeDal) {
 
-    fun createChargeTransaction(charge: Charge): Charge? {
-        return dal.createChargeTransaction(charge)
-    }
+    fun createChargeTransaction(charge: Charge): Charge = dal.createChargeTransaction(charge)
 
-    fun fetchAll(): List<Charge> {
-        return dal.fetchChargeTransaction()
-    }
+    fun fetchAll(): List<Charge> = dal.fetchChargeTransaction()
+
 }
