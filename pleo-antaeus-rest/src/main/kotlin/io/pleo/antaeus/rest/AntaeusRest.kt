@@ -92,10 +92,7 @@ class AntaeusRest(
                         post {
                             billingService.applyCharges()?.let { it1 -> it.json(it1) }
                         }
-                    }
-                    path("charges") {
-                        // URL: /rest/v1/charge
-                        get {
+                        get("list") {
                             it.json(chargeService.fetchAll())
                         }
                     }

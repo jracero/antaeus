@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  antaeus-app:
+    image: antaeus
+    container_name: antaeus_app
+    ports:
+      - "7000:7000"
+
+  antaeus-scheduler:
+    image: antaeus-scheduler
+    container_name: antaeus_scheduler
+    network_mode: host
+    depends_on:
+      antaeus-app:
+        condition: "service_started"
