@@ -38,7 +38,7 @@ class BillingService(
                     }
                 }
                 val chargeInvoiceStatus = processPaymentProviderResponse(charge, invoice)
-                stats(chargeInvoiceStatus, chargeTransactionStats)
+                updateStats(chargeInvoiceStatus, chargeTransactionStats)
             }
             logger.info("Transaction completed")
             return@runBlocking chargeTransactionStats
@@ -77,7 +77,7 @@ class BillingService(
         }
     }
 
-    private suspend fun stats(
+    private suspend fun updateStats(
         chargeStatus: ChargeStatus,
         chargeTransaction: ChargeTransactionStats
     ) {
