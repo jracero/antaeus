@@ -162,6 +162,7 @@ curl --location --request GET 'http://localhost:7000/rest/v1/charge/list'
 ```
 
 Response:
+
 ![alt text](images/charge_list.png)
 
 This is a sequence diagram about the calls involved in the charge process:
